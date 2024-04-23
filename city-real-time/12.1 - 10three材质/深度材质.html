@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <script src="../lib/three/three.js"></script>
+  <script src="../lib/three/dat.gui.js"></script>
+  <script src="../controls/index.js"></script>
+</head>
+<body>
+
+</body>
+</html>
+
+<script>
+  // 创建一个场景
+  const scene = new THREE.Scene();
+
+  // 创建一个相机 视点
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 130);
+  // 设置相机的位置
+  camera.position.set(0,10,20);
+
+  // 创建一个渲染器
+  const renderer = new THREE.WebGLRenderer();
+  // 设置渲染器尺寸
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  document.body.appendChild(renderer.domElement);
+
+  let cubeMaterialOutside = null;
+  const addCube = function () {
+    const cubeSize = Math.ceil(3 + (Math.random() * 3));
+    const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    const cubeMaterial = new THREE.MeshDepthMaterial({color: Math.random() * 0xffffff});
+    if (!cubeMaterialOutside) {
+      cubeMaterialOutside = cubeMaterial
+    }
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.castShadow = true;
+
+    // 设置正方体的坐标
+    cube.position.x = -60 + Math.round((Math.random() * 100));
+    cube.position.y = Math.round((Math.random() * 10));
+    cube.position.z = -100 + Math.round((Math.random() * 150));
+
+    // 把新生成的正方体添加到场景中去
+    scene.add(cube);
+  };
+  for (let i = 0; i < 100; i++) {
+    addCube()
+  }
+
+  // 添加灯光
+  const spotLight = new THREE.SpotLight(0xffffff);
+  spotLight.position.set(-10,10,90);
+  scene.add(spotLight);
+  spotLight.shadowMapWidth = 4096;
+  spotLight.shadowMapHeight = 4096;
+
+  initControls(cubeMaterialOutside, camera, cubeMaterialOutside, scene);
+  const animation = () => {
+    // 渲染
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(animation);
+  }
+  animation()
+</script>
